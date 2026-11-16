@@ -1,1162 +1,2020 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AgriGuard | Smart Farming Dashboard</title>
-<meta name="description" content="AgriGuard smart farming and crop protection dashboard.">
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
-
-:root {
-  --pink:#c23d83;
-  --pink-dark:#9e2c6b;
-  --pink-soft:#f6dce9;
-  --sage:#719778;
-  --sage-dark:#3e6549;
-  --sage-soft:#dcebd8;
-  --purple:#9670b8;
-  --purple-soft:#e9def4;
-  --ink:#292632;
-  --muted:#777480;
-  --line:#e6dfe9;
-  --card:#ffffff;
-  --shadow:0 14px 34px rgba(76,48,83,.09);
-}
-
-* { box-sizing:border-box; }
-
-body {
-  margin:0;
-  min-height:100vh;
-  color:var(--ink);
-  font-family:'DM Sans',sans-serif;
-  background:
-    radial-gradient(ellipse at 10% 0%,#f2d8e8 0,transparent 30%),
-    radial-gradient(ellipse at 95% 12%,#dcebd7 0,transparent 28%),
-    linear-gradient(135deg,#f8f4fb,#f7faf3 55%,#fff1f7);
-  background-attachment:fixed;
-  transition:background .25s,color .25s;
-}
-
-button,input { font:inherit; }
-button { cursor:pointer; }
-button:focus-visible,input:focus-visible {
-  outline:3px solid #ad83c9;
-  outline-offset:3px;
-}
-
-.app { display:flex; min-height:100vh; }
-
-.sidebar {
-  width:245px;
-  flex:0 0 245px;
-  padding:27px 17px;
-  display:flex;
-  flex-direction:column;
-  gap:30px;
-  background:linear-gradient(180deg,#fffdfd,#f1f7ef 65%,#f8edf5);
-  border-right:1px solid #e5dce8;
-}
-
-.brand { display:flex; align-items:center; gap:11px; padding:0 9px; }
-
-.brand-mark {
-  width:44px;
-  height:44px;
-  display:grid;
-  place-items:center;
-  color:white;
-  font-size:22px;
-  border-radius:15px;
-  background:linear-gradient(140deg,#c23d83,#956bb5 58%,#719778);
-  box-shadow:0 9px 22px #a75b9b44;
-}
-
-.brand-name {
-  font:800 21px 'Manrope',sans-serif;
-  letter-spacing:-.8px;
-}
-
-.brand-name span { color:var(--pink); }
-.brand-sub { font-size:10px; color:var(--muted); margin-top:3px; }
-
-.nav-label {
-  color:#a59ba8;
-  font-size:10px;
-  font-weight:800;
-  letter-spacing:1.6px;
-  padding:0 12px;
-  margin-bottom:10px;
-}
-
-.nav { display:grid; gap:7px; }
-
-.nav button {
-  display:flex;
-  align-items:center;
-  gap:12px;
-  width:100%;
-  padding:13px;
-  border:0;
-  border-radius:13px;
-  color:#706b78;
-  background:transparent;
-  text-align:left;
-  font-size:12px;
-  font-weight:700;
-  transition:.2s;
-}
-
-.nav button:hover { background:#f8e7f0; color:var(--pink-dark); }
-
-.nav button.active {
-  color:var(--pink-dark);
-  background:linear-gradient(100deg,#f4d8e8,#eae0f5);
-  box-shadow:inset 3px 0 var(--pink),0 5px 15px #a46ba110;
-}
-
-.nav-icon { width:21px; text-align:center; font-size:17px; }
-
-.sidebar-bottom { margin-top:auto; }
-
-.help-card {
-  padding:17px;
-  border-radius:18px;
-  background:linear-gradient(145deg,#dcebd8,#eee2f5 65%,#f8ddea);
-  border:1px solid #dfd9e8;
-}
-
-.help-card .plant { font-size:25px; margin-bottom:9px; }
-.help-card strong { font-size:13px; }
-.help-card p { color:#6e6c75; font-size:11px; line-height:1.6; }
-.small-link { border:0; background:transparent; color:var(--sage-dark); font-size:11px; font-weight:800; padding:0; }
-
-.main {
-  min-width:0;
-  flex:1;
-  width:100%;
-  max-width:1600px;
-  margin:0 auto;
-  padding:27px clamp(16px,3vw,42px) 35px;
-}
-
-.topbar {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:15px;
-  margin-bottom:25px;
-}
-
-.eyebrow {
-  color:#8c4e9d;
-  text-transform:uppercase;
-  font-size:10px;
-  font-weight:800;
-  letter-spacing:1.8px;
-  margin-bottom:7px;
-}
-
-h1 {
-  font:800 clamp(24px,3vw,32px) 'Manrope',sans-serif;
-  letter-spacing:-1.2px;
-  margin:0;
-}
-
-.subtitle { color:var(--muted); font-size:12px; margin-top:7px; }
-
-.top-actions { display:flex; align-items:center; gap:9px; }
-
-.date-pill,.icon-button {
-  border:1px solid var(--line);
-  background:var(--card);
-  color:var(--ink);
-  border-radius:13px;
-  padding:11px 12px;
-  font-size:11px;
-}
-
-.icon-button {
-  width:42px;
-  height:42px;
-  display:grid;
-  place-items:center;
-  font-size:18px;
-  position:relative;
-}
-
-.avatar {
-  width:42px;
-  height:42px;
-  display:grid;
-  place-items:center;
-  border-radius:14px;
-  background:linear-gradient(140deg,#dcebd8,#eadcf5);
-  color:#4c6e53;
-  font-size:12px;
-  font-weight:800;
-}
-
-.welcome {
-  position:relative;
-  overflow:hidden;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:18px;
-  padding:26px;
-  margin-bottom:23px;
-  border:1px solid #e5cfe0;
-  border-radius:25px;
-  background:
-    radial-gradient(circle at 88% 10%,#ffffffb8,transparent 22%),
-    linear-gradient(112deg,#f4d5e6,#e9def5 48%,#d9ead5);
-  box-shadow:0 15px 35px #95649b1b;
-}
-
-.welcome:after {
-  content:"✿";
-  position:absolute;
-  right:23%;
-  top:-44px;
-  color:#a55e9a22;
-  font-size:155px;
-  transform:rotate(-18deg);
-}
-
-.welcome-copy { position:relative; z-index:1; }
-.welcome h2 { font:800 22px 'Manrope',sans-serif; margin:0 0 8px; }
-.welcome p { max-width:530px; color:#6e6574; font-size:12px; line-height:1.7; margin:0; }
-
-.status-chip {
-  position:relative;
-  z-index:1;
-  display:inline-flex;
-  align-items:center;
-  gap:7px;
-  padding:10px 13px;
-  white-space:nowrap;
-  border-radius:99px;
-  background:#ffffffd9;
-  border:1px solid #d3e4d0;
-  color:var(--sage-dark);
-  font-size:11px;
-  font-weight:800;
-}
-
-.dot { width:7px; height:7px; display:inline-block; border-radius:50%; background:#68a879; }
-
-.section-heading {
-  display:flex;
-  align-items:end;
-  justify-content:space-between;
-  gap:12px;
-  margin:27px 0 13px;
-}
-
-.section-heading h2 { font:800 16px 'Manrope',sans-serif; margin:0; }
-.section-heading p { color:var(--muted); font-size:11px; margin:5px 0 0; }
-
-.text-button {
-  border:0;
-  background:transparent;
-  color:var(--pink-dark);
-  font-size:11px;
-  font-weight:800;
-}
-
-.stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; }
-
-.stat-card,.panel,.trend-card,.tip-card {
-  min-width:0;
-  border:1px solid #e5dce8;
-  border-radius:21px;
-  background:var(--card);
-  box-shadow:var(--shadow);
-}
-
-.stat-card {
-  position:relative;
-  overflow:hidden;
-  padding:18px;
-  transition:transform .2s,box-shadow .2s;
-}
-
-.stat-card:before {
-  content:"";
-  position:absolute;
-  top:0;left:0;right:0;
-  height:4px;
-  background:linear-gradient(90deg,#c23d83,#9870b8,#719778);
-}
-
-.stat-card:hover { transform:translateY(-4px); box-shadow:0 17px 35px #70527720; }
-
-.stat-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
-.stat-label { color:var(--muted); font-size:11px; font-weight:700; }
-
-.stat-icon {
-  width:37px;height:37px;
-  display:grid;place-items:center;
-  border-radius:12px;
-  font-size:17px;
-}
-
-.pink-icon { background:linear-gradient(145deg,#f8d9e9,#efbdd8); }
-.sage-icon { background:linear-gradient(145deg,#e0efdc,#bad7b8); }
-.purple-icon { background:linear-gradient(145deg,#eee2f8,#d7c2e9); }
-
-.stat-value { font:800 27px 'Manrope',sans-serif; margin:13px 0 5px; letter-spacing:-1px; }
-.stat-foot { color:var(--muted); font-size:10px; }
-.good { color:var(--sage-dark); font-weight:800; }
-.warn { color:#bf7b29; font-weight:800; }
-
-.content-grid {
-  display:grid;
-  grid-template-columns:minmax(0,1.2fr) minmax(285px,.8fr);
-  gap:16px;
-  margin-top:17px;
-}
-
-.panel { padding:21px; }
-.panel-header { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:18px; }
-.panel-title { font:800 15px 'Manrope',sans-serif; margin:0; }
-.panel-subtitle { color:var(--muted); font-size:11px; margin:5px 0 0; }
-
-.tag { padding:6px 9px; border-radius:9px; font-size:9px; font-weight:800; white-space:nowrap; }
-.tag-live { background:var(--sage-soft); color:var(--sage-dark); }
-.tag-demo { background:linear-gradient(120deg,#f6dce9,#e9def4); color:#8c3978; }
-
-.moisture-layout { display:flex; align-items:center; gap:23px; }
-
-.gauge {
-  --moisture:58%;
-  width:145px;
-  height:145px;
-  flex:0 0 145px;
-  display:grid;
-  place-items:center;
-  position:relative;
-  border-radius:50%;
-  background:conic-gradient(#6f9b77 var(--moisture),#e8e2ef 0);
-  box-shadow:0 9px 24px #709a7720;
-}
-
-.gauge:before {
-  content:"";
-  position:absolute;
-  inset:11px;
-  border-radius:50%;
-  background:var(--card);
-}
-
-.gauge-content { position:relative; text-align:center; }
-.gauge-number { font:800 30px 'Manrope',sans-serif; letter-spacing:-1px; }
-.gauge-unit { color:var(--muted); font-size:11px; }
-
-.moisture-info { flex:1; min-width:0; }
-.moisture-info h3 { font:800 15px 'Manrope',sans-serif; margin:0 0 7px; }
-.moisture-info p { color:var(--muted); font-size:11px; line-height:1.7; margin:0 0 15px; }
-.range-row { display:flex; justify-content:space-between; gap:8px; color:var(--muted); font-size:10px; margin-bottom:8px; }
-input[type="range"] { width:100%; accent-color:var(--sage); }
-.demo-note { color:var(--muted); font-size:10px; line-height:1.6; margin-top:10px; }
-
-.pump-card {
-  padding:18px;
-  border:1px solid #d9dfd9;
-  border-radius:18px;
-  background:
-    radial-gradient(circle at 100% 0%,#ffffffb0,transparent 32%),
-    linear-gradient(135deg,#dcebd8,#e9e0f5 57%,#f7ddeb);
-}
-
-.pump-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
-.pump-icon { width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:#ffffffc9;font-size:22px; }
-.pump-title { font-size:13px; font-weight:800; }
-.pump-caption { color:var(--muted); font-size:10px; margin-top:5px; }
-
-.toggle {
-  width:47px;height:27px;
-  border:0;border-radius:99px;
-  padding:3px;
-  background:#bcbcc2;
-  transition:.2s;
-}
-
-.toggle:after {
-  content:"";
-  display:block;
-  width:21px;height:21px;
-  border-radius:50%;
-  background:white;
-  box-shadow:0 1px 4px #0002;
-  transition:.2s;
-}
-
-.toggle.on { background:var(--sage); }
-.toggle.on:after { transform:translateX(20px); }
-
-.pump-status-line {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin-top:17px;
-  padding-top:14px;
-  border-top:1px solid #d8dfd8;
-  font-size:11px;
-}
-
-.pump-status { display:inline-flex; align-items:center; gap:6px; color:var(--sage-dark); font-weight:800; }
-.pump-status .dot { background:#a1a39f; }
-.pump-status.running .dot { background:#4fa76b; box-shadow:0 0 0 4px #59a66f22; }
-
-.pump-actions { display:flex; gap:9px; margin-top:15px; }
-.btn { border:0; border-radius:11px; padding:11px 13px; font-size:11px; font-weight:800; transition:.2s; }
-.btn-primary { color:white; background:linear-gradient(120deg,#bd397d,#9257ac); box-shadow:0 7px 17px #a7397e35; }
-.btn-primary:hover { transform:translateY(-2px); filter:brightness(.95); }
-.btn-soft { color:var(--sage-dark); background:#ffffffd9; border:1px solid #d7e3d4; }
-.btn-soft:hover { background:var(--sage-soft); }
-.pump-actions .btn { flex:1; }
-
-.lower-grid,.insight-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-top:16px; }
-
-.sensor-list { display:grid; gap:15px; }
-.sensor-row { display:flex; align-items:center; gap:12px; }
-.sensor-symbol { width:40px;height:40px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(145deg,#f5dfed,#e9def5);font-size:18px;flex-shrink:0; }
-.sensor-main { flex:1; min-width:0; }
-.sensor-name { font-size:12px; font-weight:800; }
-.sensor-desc { color:var(--muted); font-size:10px; margin-top:4px; }
-.sensor-state { display:inline-flex;align-items:center;gap:5px;color:var(--sage-dark);font-size:10px;font-weight:800;white-space:nowrap; }
-.sensor-state .dot { width:6px;height:6px; }
-
-.activity-list { display:grid; }
-.activity-item { display:flex; align-items:flex-start; gap:10px; padding:12px 0; border-bottom:1px solid #f0eaf1; }
-.activity-item:last-child { border-bottom:0; }
-.activity-icon { width:32px;height:32px;display:grid;place-items:center;flex-shrink:0;border-radius:11px;background:var(--sage-soft); }
-.activity-icon.alert { background:var(--pink-soft); color:var(--pink-dark); }
-.activity-copy { flex:1; min-width:0; }
-.activity-copy strong { display:block;font-size:11px;margin:2px 0 4px; }
-.activity-copy span { display:block;color:var(--muted);font-size:10px;line-height:1.5; }
-.activity-time { color:var(--muted);font-size:9px;white-space:nowrap;padding-top:4px; }
-
-.trend-card,.tip-card { padding:21px; }
-.trend-head { display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:17px; }
-.trend-title { font:800 14px 'Manrope',sans-serif;margin:0; }
-.trend-caption { color:var(--muted);font-size:10px;margin-top:5px; }
-.trend-badge { background:linear-gradient(130deg,#f3dce9,#e8def5);color:#814687;border-radius:9px;padding:7px 9px;font-size:10px;font-weight:800; }
-
-.chart {
-  height:115px;
-  display:flex;
-  align-items:flex-end;
-  gap:clamp(8px,2vw,18px);
-  padding:0 5px;
-  border-bottom:1px solid var(--line);
-}
-
-.chart-day { flex:1; height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:7px; }
-.chart-bar { width:min(27px,78%);min-height:8px;border-radius:8px 8px 3px 3px;background:linear-gradient(180deg,#c45b9b,#9a70b8 50%,#719778); }
-.chart-day span { color:var(--muted);font-size:9px;padding-bottom:8px; }
-
-.tip-card {
-  position:relative;
-  overflow:hidden;
-  background:radial-gradient(circle at 100% 0%,#ffffffb0,transparent 28%),linear-gradient(140deg,#dcebd8,#e8def4 60%,#f6ddeb);
-}
-
-.tip-icon { width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:#ffffffc9;font-size:21px;margin-bottom:14px; }
-.tip-card h3 { font:800 15px 'Manrope',sans-serif;margin:0 0 8px; }
-.tip-card p { color:#6e6b75;font-size:11px;line-height:1.7;margin:0; }
-.tip-tag { display:inline-flex;margin-top:13px;background:#ffffffa8;color:#42694a;border-radius:8px;padding:7px 9px;font-size:10px;font-weight:800; }
-
-.field-zones { margin-top:16px; }
-.zone-grid { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px; }
-
-.zone-card { padding:16px;border-radius:17px;border:1px solid transparent;min-width:0;transition:transform .2s; }
-.zone-card:hover { transform:translateY(-3px); }
-.zone-green { background:linear-gradient(145deg,#dcebd8,#f3f8f0);border-color:#d1e3ce; }
-.zone-purple { background:linear-gradient(145deg,#e9def4,#faf6fc);border-color:#dfd0ed; }
-.zone-pink { background:linear-gradient(145deg,#f6dce9,#fff6fa);border-color:#edcfe0; }
-.zone-top { display:flex;align-items:center;justify-content:space-between;gap:8px; }
-.zone-emoji { width:38px;height:38px;display:grid;place-items:center;background:#ffffffb8;border-radius:13px;font-size:19px; }
-.zone-status { display:inline-flex;align-items:center;gap:5px;background:#ffffffb8;border-radius:99px;padding:6px 8px;font-size:9px;font-weight:800;color:var(--sage-dark); }
-.zone-status i { width:6px;height:6px;border-radius:50%;background:#70a47a; }
-.zone-card h3 { font:800 12px 'Manrope',sans-serif;margin:13px 0 5px; }
-.zone-card p { color:var(--muted);font-size:10px;margin:0 0 13px; }
-.zone-meter { height:7px;border-radius:99px;background:#77748024;overflow:hidden; }
-.zone-meter span { display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#bd397d,#9870b8,#719879); }
-.zone-card small { display:block;color:var(--muted);font-size:9px;margin-top:7px; }
-
-.quick-actions {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:15px;
-  margin-top:17px;
-  padding:16px;
-  border-radius:16px;
-  background:linear-gradient(105deg,#f8eaf3,#eee5f6 53%,#eaf3e6);
-  border:1px solid #e5d9e8;
-}
-
-.quick-actions strong { font:800 12px 'Manrope',sans-serif; }
-.quick-actions p { color:var(--muted);font-size:10px;line-height:1.5;margin:5px 0 0; }
-.quick-action-buttons { display:flex;flex-wrap:wrap;gap:9px; }
-
-.footer {
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  padding:22px 2px 0;
-  color:var(--muted);
-  font-size:10px;
-}
-
-.footer strong { color:var(--pink-dark); }
-
-.toast {
-  position:fixed;
-  z-index:50;
-  right:22px;
-  bottom:22px;
-  max-width:calc(100vw - 44px);
-  padding:14px 17px;
-  border-radius:13px;
-  background:#302a37;
-  color:white;
-  box-shadow:var(--shadow);
-  font-size:12px;
-  opacity:0;
-  transform:translateY(10px);
-  pointer-events:none;
-  transition:.25s;
-}
-
-.toast.show { opacity:1;transform:translateY(0); }
-
-/* DARK THEME */
-body[data-theme="dark"] {
-  --ink:#f0ebf3;
-  --muted:#bbb2c4;
-  --line:#45404e;
-  --card:#292631;
-  --shadow:0 14px 34px #0003;
-  background:
-    radial-gradient(ellipse at 10% 0%,#542a4b66,transparent 32%),
-    radial-gradient(ellipse at 95% 12%,#304a3566,transparent 30%),
-    linear-gradient(135deg,#191820,#211d29 55%,#211b24);
-  background-attachment:fixed;
-}
-
-body[data-theme="dark"] .sidebar { background:linear-gradient(180deg,#211e29,#202b25 65%,#2b202b);border-color:#45404e; }
-body[data-theme="dark"] .brand-sub,
-body[data-theme="dark"] .nav button { color:#c0b8c6; }
-body[data-theme="dark"] .nav button.active { background:linear-gradient(100deg,#49283f,#3b304b);color:#f4d9eb; }
-body[data-theme="dark"] .stat-card,
-body[data-theme="dark"] .panel,
-body[data-theme="dark"] .trend-card { background:linear-gradient(145deg,#292631,#24232d);border-color:#45404e; }
-body[data-theme="dark"] .welcome { background:linear-gradient(112deg,#49273f,#382b4c 48%,#263c2e);border-color:#59415d; }
-body[data-theme="dark"] .welcome p,
-body[data-theme="dark"] .tip-card p { color:#d0c5d3; }
-body[data-theme="dark"] .pump-card { background:linear-gradient(135deg,#293e30,#352b43 58%,#42273a);border-color:#4b4552; }
-body[data-theme="dark"] .gauge:before { background:#292631; }
-body[data-theme="dark"] .help-card { background:linear-gradient(145deg,#293e30,#352b43 65%,#42273a);border-color:#4b4552; }
-body[data-theme="dark"] .help-card p { color:#d0c5d3; }
-body[data-theme="dark"] .tip-card { background:linear-gradient(140deg,#293e30,#352b43 60%,#42273a);border-color:#4b4552; }
-body[data-theme="dark"] .zone-green { background:linear-gradient(145deg,#243a2b,#29342d);border-color:#3c5842; }
-body[data-theme="dark"] .zone-purple { background:linear-gradient(145deg,#33283e,#292631);border-color:#51415f; }
-body[data-theme="dark"] .zone-pink { background:linear-gradient(145deg,#402536,#292631);border-color:#5a394b; }
-body[data-theme="dark"] .zone-card p,
-body[data-theme="dark"] .zone-card small,
-body[data-theme="dark"] .quick-actions p { color:#c1b8c7; }
-body[data-theme="dark"] .zone-emoji,
-body[data-theme="dark"] .zone-status,
-body[data-theme="dark"] .tip-icon { background:#302d39;color:#e5dce9; }
-body[data-theme="dark"] .quick-actions { background:linear-gradient(105deg,#352738,#30283d 52%,#26362c);border-color:#4a3d50; }
-body[data-theme="dark"] .btn-soft { background:linear-gradient(135deg,#302e39,#292f2b);color:#c9e0cb;border-color:#465447; }
-body[data-theme="dark"] .date-pill,
-body[data-theme="dark"] .icon-button { background:#292631;color:#f0ebf3;border-color:#45404e; }
-body[data-theme="dark"] .activity-item { border-color:#403b48; }
-body[data-theme="dark"] .pump-status-line { border-color:#4b4552; }
-
-@media(max-width:1100px) {
-  .sidebar { width:210px;flex-basis:210px; }
-  .stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
-  .content-grid { grid-template-columns:1fr; }
-}
-
-@media(max-width:800px) {
-  .app { display:block; }
-  .sidebar { width:100%;padding:15px;gap:14px;border-right:0;border-bottom:1px solid var(--line); }
-  .sidebar-bottom { display:none; }
-  .nav-label { display:none; }
-  .nav { display:flex;overflow-x:auto;gap:6px;padding-bottom:3px; }
-  .nav button { width:auto;white-space:nowrap;padding:10px 12px; }
-  .nav button.active { box-shadow:inset 0 -3px var(--pink); }
-  .main { padding:20px 15px 28px; }
-  .lower-grid,.insight-grid { grid-template-columns:1fr; }
-  .zone-grid { grid-template-columns:1fr; }
-}
-
-@media(max-width:520px) {
-  .topbar { align-items:flex-start; }
-  .top-actions { gap:5px; }
-  .date-pill { display:none; }
-  .welcome { align-items:flex-start;flex-direction:column;padding:22px; }
-  .welcome:after { right:0; }
-  .stats { gap:10px; }
-  .stat-card { padding:14px; }
-  .stat-value { font-size:23px; }
-  .moisture-layout { flex-direction:column;align-items:stretch; }
-  .gauge { align-self:center; }
-  .pump-actions { flex-direction:column; }
-  .quick-actions { flex-direction:column;align-items:flex-start; }
-  .quick-action-buttons { width:100%; }
-  .quick-action-buttons .btn { flex:1; }
-  .footer { flex-direction:column; }
-}
-</style>
-</head>
-
-<body>
-<div class="app">
-
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-mark">🌱</div>
-      <div>
-        <div class="brand-name">Agri<span>Guard</span></div>
-        <div class="brand-sub">SMART FARMING SYSTEM</div>
-      </div>
-    </div>
-
-    <div>
-      <div class="nav-label">WORKSPACE</div>
-      <nav class="nav">
-        <button class="active" data-section="dashboard"><span class="nav-icon">▦</span> Dashboard</button>
-        <button data-section="intrusion"><span class="nav-icon">⌁</span> Intrusion alerts</button>
-        <button data-section="irrigation"><span class="nav-icon">♧</span> Irrigation control</button>
-        <button data-section="sensors"><span class="nav-icon">◉</span> Sensor health</button>
-        <button data-section="activity"><span class="nav-icon">◷</span> Activity history</button>
-      </nav>
-    </div>
-
-    <div class="sidebar-bottom">
-      <div class="help-card">
-        <div class="plant">🌿</div>
-        <strong>Grow smarter, naturally.</strong>
-        <p>Monitor your field, explore sample sensor readings, and manage irrigation from one place.</p>
-        <button class="small-link" id="aboutButton">About AgriGuard ↗</button>
-      </div>
-    </div>
-  </aside>
-
-  <main class="main">
-    <header class="topbar">
-      <div>
-        <div class="eyebrow">SMART AGRICULTURE · OVERVIEW</div>
-        <h1>Farm Dashboard</h1>
-        <div class="subtitle">A clearer view of your field, moisture and crop protection.</div>
-      </div>
-
-      <div class="top-actions">
-        <div class="date-pill" id="dateLabel">📅 Today</div>
-        <button class="icon-button" id="notificationButton" title="View demo alerts" aria-label="View demo alerts">♧<span class="notification-dot"></span></button>
-        <button class="icon-button" id="themeToggle" aria-label="Switch to dark mode" title="Switch theme"><span id="themeIcon">☾</span></button>
-        <div class="avatar" title="AgriGuard">AG</div>
-      </div>
-    </header>
-
-    <section class="welcome" id="welcomePanel">
-      <div class="welcome-copy">
-        <div class="eyebrow">YOUR FARM, AT A GLANCE</div>
-        <h2>Good day, Farmer! 🌱</h2>
-        <p>Keep an eye on soil moisture, irrigation and possible field activity. This dashboard currently uses simulated data for demonstration.</p>
-      </div>
-      <div class="status-chip"><span class="dot"></span> Demo system ready</div>
-    </section>
-
-    <div class="section-heading">
-      <div>
-        <h2>Farm overview</h2>
-        <p>A quick snapshot of your farm's current status.</p>
-      </div>
-      <button class="text-button" id="refreshButton">↻ Refresh demo data</button>
-    </div>
-
-    <section class="stats">
-      <article class="stat-card">
-        <div class="stat-top"><span class="stat-label">Soil moisture</span><span class="stat-icon sage-icon">💧</span></div>
-        <div class="stat-value"><span id="statMoisture">58</span>%</div>
-        <div class="stat-foot"><span class="good">● Sample reading</span></div>
-      </article>
-
-      <article class="stat-card">
-        <div class="stat-top"><span class="stat-label">Intrusion alerts</span><span class="stat-icon pink-icon">⌁</span></div>
-        <div class="stat-value" id="statAlerts">02</div>
-        <div class="stat-foot"><span class="warn">● Demo alerts</span></div>
-      </article>
-
-      <article class="stat-card">
-        <div class="stat-top"><span class="stat-label">Water pump</span><span class="stat-icon sage-icon">♧</span></div>
-        <div class="stat-value" id="statPump">OFF</div>
-        <div class="stat-foot">Controlled by demo buttons</div>
-      </article>
-
-      <article class="stat-card">
-        <div class="stat-top"><span class="stat-label">Sensors online</span><span class="stat-icon purple-icon">◉</span></div>
-        <div class="stat-value">03 <span style="font-size:13px;color:var(--muted)">/ 03</span></div>
-        <div class="stat-foot"><span class="good">● Sample sensor status</span></div>
-      </article>
-    </section>
-
-    <div class="content-grid">
-      <section class="panel" id="moisturePanel">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">Soil moisture monitor</h2>
-            <p class="panel-subtitle">Explore how different moisture levels affect the dashboard.</p>
-          </div>
-          <span class="tag tag-demo">SIMULATED</span>
-        </div>
-
-        <div class="moisture-layout">
-          <div class="gauge" id="moistureGauge">
-            <div class="gauge-content">
-              <div class="gauge-number"><span id="gaugeValue">58</span>%</div>
-              <div class="gauge-unit">Soil moisture</div>
-            </div>
-          </div>
-
-          <div class="moisture-info">
-            <h3 id="moistureState">Looking good!</h3>
-            <p id="moistureMessage">The demo moisture level is within the target range. Your plant can wait before its next watering.</p>
-            <div class="range-row"><span>Dry</span><span>Ideal</span><span>Wet</span></div>
-            <input type="range" id="moistureSlider" min="0" max="100" value="58" aria-label="Adjust demo soil moisture">
-            <div class="demo-note" id="moistureCaption"><span class="good">● Healthy range</span></div>
-          </div>
-        </div>
-        <p class="demo-note">Demo only: moving the slider changes the sample reading, not a physical sensor.</p>
-      </section>
-
-      <section class="panel" id="pumpPanel">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">Irrigation control</h2>
-            <p class="panel-subtitle">Manage the simulated water pump.</p>
-          </div>
-          <span class="tag tag-live">DEMO CONTROL</span>
-        </div>
-
-        <div class="pump-card">
-          <div class="pump-head">
-            <div style="display:flex;align-items:center;gap:12px">
-              <div class="pump-icon">♧</div>
-              <div>
-                <div class="pump-title">Main water pump</div>
-                <div class="pump-caption" id="pumpCaption"><span class="good">●</span> Waiting for dry-soil condition</div>
-              </div>
-            </div>
-            <button class="toggle" id="pumpToggle" role="switch" aria-checked="false" aria-label="Toggle demo pump"></button>
-          </div>
-
-          <div class="pump-status-line">
-            <span>Current status</span>
-            <span class="pump-status" id="pumpStatus"><span class="dot"></span><span id="pumpStatusText">Pump is off</span></span>
-          </div>
-
-          <div class="pump-actions">
-            <button class="btn btn-primary" id="startPump">▶ Start pump</button>
-            <button class="btn btn-soft" id="stopPump">■ Stop pump</button>
-          </div>
-        </div>
-        <p class="demo-note">The buttons do not switch a real pump on or off.</p>
-      </section>
-    </div>
-
-    <div class="lower-grid">
-      <section class="panel" id="sensorPanel">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">Sensor health</h2>
-            <p class="panel-subtitle">Sample status of the planned field sensors.</p>
-          </div>
-          <span class="tag tag-live">3 SENSORS</span>
-        </div>
-
-        <div class="sensor-list">
-          <div class="sensor-row">
-            <div class="sensor-symbol">◉</div>
-            <div class="sensor-main"><div class="sensor-name">Soil moisture sensor</div><div class="sensor-desc">Soil hydration monitoring</div></div>
-            <div class="sensor-state"><span class="dot"></span> Demo ready</div>
-          </div>
-          <div class="sensor-row">
-            <div class="sensor-symbol">⌁</div>
-            <div class="sensor-main"><div class="sensor-name">PIR motion sensor</div><div class="sensor-desc">Movement detection near the field</div></div>
-            <div class="sensor-state"><span class="dot"></span> Demo ready</div>
-          </div>
-          <div class="sensor-row">
-            <div class="sensor-symbol">⌖</div>
-            <div class="sensor-main"><div class="sensor-name">Ultrasonic sensor</div><div class="sensor-desc">Distance and proximity monitoring</div></div>
-            <div class="sensor-state"><span class="dot"></span> Demo ready</div>
-          </div>
-        </div>
-        <p class="demo-note">These statuses are examples and do not confirm that the hardware is connected.</p>
-      </section>
-
-      <section class="panel" id="activityPanel">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">Recent activity</h2>
-            <p class="panel-subtitle">Sample events from this dashboard session.</p>
-          </div>
-          <button class="text-button" id="clearActivity">Clear all</button>
-        </div>
-
-        <div class="activity-list" id="activityList">
-          <div class="activity-item">
-            <div class="activity-icon alert">⌁</div>
-            <div class="activity-copy"><strong>Intrusion alert recorded</strong><span>Possible movement detected near the field.</span></div>
-            <span class="activity-time">10:42 AM</span>
-          </div>
-          <div class="activity-item">
-            <div class="activity-icon">💧</div>
-            <div class="activity-copy"><strong>Soil moisture checked</strong><span>Demo reading is currently within target range.</span></div>
-            <span class="activity-time">10:18 AM</span>
-          </div>
-          <div class="activity-item">
-            <div class="activity-icon">♧</div>
-            <div class="activity-copy"><strong>Irrigation system idle</strong><span>Pump is waiting for a dry-soil condition.</span></div>
-            <span class="activity-time">09:55 AM</span>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <div class="insight-grid">
-      <section class="trend-card">
-        <div class="trend-head">
-          <div>
-            <h2 class="trend-title">Weekly moisture trend</h2>
-            <div class="trend-caption">Illustrative readings across the last seven days.</div>
-          </div>
-          <span class="trend-badge">THIS WEEK</span>
-        </div>
-
-        <div class="chart" aria-label="Sample weekly moisture chart">
-          <div class="chart-day"><div class="chart-bar" style="height:44%"></div><span>Mon</span></div>
-          <div class="chart-day"><div class="chart-bar" style="height:61%"></div><span>Tue</span></div>
-          <div class="chart-day"><div class="chart-bar" style="height:52%"></div><span>Wed</span></div>
-          <div class="chart-day"><div class="chart-bar" style="height:73%"></div><span>Thu</span></div>
-          <div class="chart-day"><div class="chart-bar" style="height:66%"></div><span>Fri</span></div>
-          <div class="chart-day"><div class="chart-bar" style="height:83%"></div><span>Sat</span></div>
-          <div class="chart-day"><div class="chart-bar" style="height:58%"></div><span>Sun</span></div>
-        </div>
-        <p class="demo-note">Chart values are illustrative, not readings collected from your field.</p>
-      </section>
-
-      <section class="tip-card">
-        <div class="tip-icon">🌱</div>
-        <h3>Today's field note</h3>
-        <p>Check soil moisture before watering. Too much water can reduce air around plant roots, while dry soil can stress crops. The ideal moisture level depends on the crop and soil type.</p>
-        <span class="tip-tag">SMART WATERING TIP</span>
-      </section>
-    </div>
-
-    <section class="panel field-zones" id="fieldZonesPanel">
-      <div class="panel-header">
-        <div>
-          <h2 class="panel-title">Field zones & quick actions</h2>
-          <p class="panel-subtitle">An overview of areas you could monitor in a real deployment.</p>
-        </div>
-        <span class="tag tag-demo">INTERACTIVE DEMO</span>
-      </div>
-
-      <div class="zone-grid">
-        <article class="zone-card zone-green">
-          <div class="zone-top"><span class="zone-emoji">🌿</span><span class="zone-status"><i></i> Stable</span></div>
-          <h3>Zone A · Crop beds</h3>
-          <p>Moisture-focused monitoring</p>
-          <div class="zone-meter"><span style="width:68%"></span></div>
-          <small>Sample condition · 68%</small>
-        </article>
-
-        <article class="zone-card zone-purple">
-          <div class="zone-top"><span class="zone-emoji">🛡️</span><span class="zone-status"><i></i> Protected</span></div>
-          <h3>Zone B · Field boundary</h3>
-          <p>Movement and intrusion watch</p>
-          <div class="zone-meter"><span style="width:84%"></span></div>
-          <small>Sample coverage · 84%</small>
-        </article>
-
-        <article class="zone-card zone-pink">
-          <div class="zone-top"><span class="zone-emoji">💧</span><span class="zone-status"><i></i> Monitor</span></div>
-          <h3>Zone C · Water line</h3>
-          <p>Irrigation system overview</p>
-          <div class="zone-meter"><span style="width:52%"></span></div>
-          <small>Sample readiness · 52%</small>
-        </article>
-      </div>
-
-      <div class="quick-actions">
-        <div>
-          <strong>Try a dashboard action</strong>
-          <p>These buttons add sample events only. They do not contact real sensors.</p>
-        </div>
-        <div class="quick-action-buttons">
-          <button class="btn btn-primary" id="simulateAlert">＋ Simulate intrusion alert</button>
-          <button class="btn btn-soft" id="systemCheck">✓ Run system check</button>
-        </div>
-      </div>
-    </section>
-
-    <footer class="footer">
-      <span><strong>AgriGuard</strong> · Smarter crop protection, gentler irrigation.</span>
-      <span>Student project prototype · Dashboard UI preview</span>
-    </footer>
-  </main>
-</div>
-
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-<script>
-const $ = id => document.getElementById(id);
-
-let pumpOn = false;
-let alertCount = 2;
-let toastTimer;
-
-function showToast(message) {
-  const toast = $("toast");
-  toast.textContent = message;
-  toast.classList.add("show");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.remove("show"), 2800);
-}
-
-function updateDate() {
-  const now = new Date();
-  $("dateLabel").textContent = "📅 " + now.toLocaleDateString(undefined, {
-    weekday:"short", month:"short", day:"numeric"
-  });
-}
-
-function addActivity(title, detail, symbol, isAlert = false) {
-  const list = $("activityList");
-  const item = document.createElement("div");
-  item.className = "activity-item";
-
-  const icon = document.createElement("div");
-  icon.className = "activity-icon" + (isAlert ? " alert" : "");
-  icon.textContent = symbol;
-
-  const copy = document.createElement("div");
-  copy.className = "activity-copy";
-
-  const strong = document.createElement("strong");
-  strong.textContent = title;
-
-  const description = document.createElement("span");
-  description.textContent = detail;
-
-  const time = document.createElement("span");
-  time.className = "activity-time";
-  time.textContent = new Date().toLocaleTimeString([], {
-    hour:"2-digit", minute:"2-digit"
-  });
-
-  copy.append(strong, description);
-  item.append(icon, copy, time);
-  list.prepend(item);
-}
-
-function setPump(isOn, logEvent = true) {
-  pumpOn = isOn;
-
-  $("pumpToggle").classList.toggle("on", pumpOn);
-  $("pumpToggle").setAttribute("aria-checked", String(pumpOn));
-  $("pumpStatus").classList.toggle("running", pumpOn);
-  $("pumpStatusText").textContent = pumpOn ? "Pump is running (demo)" : "Pump is off";
-  $("statPump").textContent = pumpOn ? "ON" : "OFF";
-
-  $("pumpCaption").innerHTML = pumpOn
-    ? '<span class="warn">●</span> Manually switched on in demo'
-    : '<span class="good">●</span> Waiting for dry-soil condition';
-
-  if (logEvent) {
-    addActivity(
-      pumpOn ? "Pump switched on" : "Pump switched off",
-      pumpOn ? "Demo control changed to ON." : "Demo control changed to OFF.",
-      "♧"
-    );
-  }
-}
-
-function updateMoisture(value) {
-  value = Number(value);
-
-  $("statMoisture").textContent = value;
-  $("gaugeValue").textContent = value;
-  $("moistureGauge").style.setProperty("--moisture", value + "%");
-  $("moistureSlider").value = value;
-
-  let state, message, caption;
-
-  if (value < 35) {
-    state = "Soil looks dry";
-    message = "The demo reading is below the dry-soil threshold. In a real system, this could trigger an irrigation recommendation.";
-    caption = '<span class="warn">● Needs watering</span>';
-  } else if (value < 75) {
-    state = "Looking good!";
-    message = "The demo moisture level is within the target range. Your plant can wait before its next watering.";
-    caption = '<span class="good">● Healthy range</span>';
-  } else {
-    state = "Soil is quite wet";
-    message = "The demo reading is high. In a real system, watering should remain off while moisture is sufficient.";
-    caption = '<span class="good">● Moist soil</span>';
-  }
-
-  $("moistureState").textContent = state;
-  $("moistureMessage").textContent = message;
-  $("moistureCaption").innerHTML = caption;
-}
-
-$("moistureSlider").addEventListener("input", event => {
-  updateMoisture(event.target.value);
-});
-
-$("pumpToggle").addEventListener("click", () => {
-  setPump(!pumpOn);
-});
-
-$("startPump").addEventListener("click", () => {
-  setPump(true);
-  showToast("Demo pump switched ON. No physical pump is connected.");
-});
-
-$("stopPump").addEventListener("click", () => {
-  setPump(false);
-  showToast("Demo pump switched OFF.");
-});
-
-$("refreshButton").addEventListener("click", () => {
-  const value = Math.floor(20 + Math.random() * 65);
-  updateMoisture(value);
-  showToast("Dashboard refreshed. The values are simulated.");
-});
-
-$("notificationButton").addEventListener("click", () => {
-  showToast(alertCount + " sample intrusion alerts in this demo.");
-});
-
-$("aboutButton").addEventListener("click", () => {
-  showToast("AgriGuard combines field intrusion alerts with soil-moisture-based irrigation.");
-});
-
-$("clearActivity").addEventListener("click", () => {
-  $("activityList").innerHTML = '<div class="demo-note">Activity list cleared for this demo session.</div>';
-  showToast("Demo activity list cleared.");
-});
-
-$("simulateAlert").addEventListener("click", () => {
-  alertCount++;
-  $("statAlerts").textContent = String(alertCount).padStart(2, "0");
-
-  addActivity(
-    "Sample intrusion alert",
-    "Simulated movement detected near the field boundary.",
-    "⌁",
-    true
-  );
-
-  showToast("Sample alert added. No real sensor was triggered.");
-});
-
-$("systemCheck").addEventListener("click", () => {
-  addActivity(
-    "Demo system check completed",
-    "Dashboard controls are responding. Hardware connectivity was not tested.",
-    "✓"
-  );
-
-  showToast("Demo check complete. Dashboard controls are responding.");
-});
-
-/* Sidebar navigation */
-document.querySelectorAll(".nav button").forEach(button => {
-  button.addEventListener("click", () => {
-    document.querySelectorAll(".nav button").forEach(item => {
-      item.classList.remove("active");
-    });
-
-    button.classList.add("active");
-
-    const targets = {
-      dashboard:$("welcomePanel"),
-      intrusion:$("activityPanel"),
-      irrigation:$("pumpPanel"),
-      sensors:$("sensorPanel"),
-      activity:$("activityPanel")
-    };
-
-    const target = targets[button.dataset.section];
-
-    if (target) {
-      target.scrollIntoView({ behavior:"smooth", block:"center" });
-    }  
-
-    showToast(button.textContent.trim() + " section selected.");
-  });
-});
-
-/* Light and dark theme */
-const themeToggle = $("themeToggle");
-
-function applyTheme(theme) {
-  document.body.dataset.theme = theme;
-
-  const dark = theme === "dark";
-  $("themeIcon").textContent = dark ? "☀" : "☾";
-
-  themeToggle.setAttribute(
-    "aria-label",
-    dark ? "Switch to light mode" : "Switch to dark mode"
-  );
-
-  themeToggle.title = dark ? "Switch to light mode" : "Switch to dark mode";
-}
-
-let savedTheme = "light";
-
-try {
-  savedTheme = localStorage.getItem("agriguard-theme") || "light";
-} catch (error) {
-  savedTheme = "light";
-}
-
-applyTheme(savedTheme);
-
-themeToggle.addEventListener("click", () => {
-  const nextTheme = document.body.dataset.theme === "dark" ? "light" : "dark";
-
-  applyTheme(nextTheme);
-
-  try {
-    localStorage.setItem("agriguard-theme", nextTheme);
-  } catch (error) {
-    /* The theme still works if local storage is unavailable. */
-  }
-
-  showToast(nextTheme === "dark" ? "Dark mode enabled." : "Light mode enabled.");
-});
-
-/* Initial dashboard state */
-updateDate();
-updateMoisture(58);
-setPump(false, false);
-</script>
-</body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>AgriGuard | Smart Farming Dashboard</title>
+		<meta
+			name="description"
+			content="AgriGuard smart farming and crop protection dashboard."
+		/>
+
+		<style>
+			@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
+
+			:root {
+				--pink: #c23d83;
+				--pink-dark: #9e2c6b;
+				--pink-soft: #f6dce9;
+				--sage: #719778;
+				--sage-dark: #3e6549;
+				--sage-soft: #dcebd8;
+				--purple: #9670b8;
+				--purple-soft: #e9def4;
+				--ink: #292632;
+				--muted: #777480;
+				--line: #e6dfe9;
+				--card: #ffffff;
+				--shadow: 0 14px 34px rgba(76, 48, 83, 0.09);
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			body {
+				margin: 0;
+				min-height: 100vh;
+				color: var(--ink);
+				font-family: "DM Sans", sans-serif;
+				background:
+					radial-gradient(ellipse at 10% 0%, #f2d8e8 0, transparent 30%),
+					radial-gradient(ellipse at 95% 12%, #dcebd7 0, transparent 28%),
+					linear-gradient(135deg, #f8f4fb, #f7faf3 55%, #fff1f7);
+				background-attachment: fixed;
+				transition:
+					background 0.25s,
+					color 0.25s;
+			}
+
+			button,
+			input {
+				font: inherit;
+			}
+			button {
+				cursor: pointer;
+			}
+			button:focus-visible,
+			input:focus-visible {
+				outline: 3px solid #ad83c9;
+				outline-offset: 3px;
+			}
+
+			.app {
+				display: flex;
+				min-height: 100vh;
+			}
+
+			.sidebar {
+				width: 245px;
+				flex: 0 0 245px;
+				padding: 27px 17px;
+				display: flex;
+				flex-direction: column;
+				gap: 30px;
+				background: linear-gradient(180deg, #fffdfd, #f1f7ef 65%, #f8edf5);
+				border-right: 1px solid #e5dce8;
+			}
+
+			.brand {
+				display: flex;
+				align-items: center;
+				gap: 11px;
+				padding: 0 9px;
+			}
+
+			.brand-mark {
+				width: 44px;
+				height: 44px;
+				display: grid;
+				place-items: center;
+				color: white;
+				font-size: 22px;
+				border-radius: 15px;
+				background: linear-gradient(140deg, #c23d83, #956bb5 58%, #719778);
+				box-shadow: 0 9px 22px #a75b9b44;
+			}
+
+			.brand-name {
+				font:
+					800 21px "Manrope",
+					sans-serif;
+				letter-spacing: -0.8px;
+			}
+
+			.brand-name span {
+				color: var(--pink);
+			}
+			.brand-sub {
+				font-size: 10px;
+				color: var(--muted);
+				margin-top: 3px;
+			}
+
+			.nav-label {
+				color: #a59ba8;
+				font-size: 10px;
+				font-weight: 800;
+				letter-spacing: 1.6px;
+				padding: 0 12px;
+				margin-bottom: 10px;
+			}
+
+			.nav {
+				display: grid;
+				gap: 7px;
+			}
+
+			.nav button {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				width: 100%;
+				padding: 13px;
+				border: 0;
+				border-radius: 13px;
+				color: #706b78;
+				background: transparent;
+				text-align: left;
+				font-size: 12px;
+				font-weight: 700;
+				transition: 0.2s;
+			}
+
+			.nav button:hover {
+				background: #f8e7f0;
+				color: var(--pink-dark);
+			}
+
+			.nav button.active {
+				color: var(--pink-dark);
+				background: linear-gradient(100deg, #f4d8e8, #eae0f5);
+				box-shadow:
+					inset 3px 0 var(--pink),
+					0 5px 15px #a46ba110;
+			}
+
+			.nav-icon {
+				width: 21px;
+				text-align: center;
+				font-size: 17px;
+			}
+
+			.sidebar-bottom {
+				margin-top: auto;
+			}
+
+			.help-card {
+				padding: 17px;
+				border-radius: 18px;
+				background: linear-gradient(145deg, #dcebd8, #eee2f5 65%, #f8ddea);
+				border: 1px solid #dfd9e8;
+			}
+
+			.help-card .plant {
+				font-size: 25px;
+				margin-bottom: 9px;
+			}
+			.help-card strong {
+				font-size: 13px;
+			}
+			.help-card p {
+				color: #6e6c75;
+				font-size: 11px;
+				line-height: 1.6;
+			}
+			.small-link {
+				border: 0;
+				background: transparent;
+				color: var(--sage-dark);
+				font-size: 11px;
+				font-weight: 800;
+				padding: 0;
+			}
+
+			.main {
+				min-width: 0;
+				flex: 1;
+				width: 100%;
+				max-width: 1600px;
+				margin: 0 auto;
+				padding: 27px clamp(16px, 3vw, 42px) 35px;
+			}
+
+			.topbar {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 15px;
+				margin-bottom: 25px;
+			}
+
+			.eyebrow {
+				color: #8c4e9d;
+				text-transform: uppercase;
+				font-size: 10px;
+				font-weight: 800;
+				letter-spacing: 1.8px;
+				margin-bottom: 7px;
+			}
+
+			h1 {
+				font:
+					800 clamp(24px, 3vw, 32px) "Manrope",
+					sans-serif;
+				letter-spacing: -1.2px;
+				margin: 0;
+			}
+
+			.subtitle {
+				color: var(--muted);
+				font-size: 12px;
+				margin-top: 7px;
+			}
+
+			.top-actions {
+				display: flex;
+				align-items: center;
+				gap: 9px;
+			}
+
+			.date-pill,
+			.icon-button {
+				border: 1px solid var(--line);
+				background: var(--card);
+				color: var(--ink);
+				border-radius: 13px;
+				padding: 11px 12px;
+				font-size: 11px;
+			}
+
+			.icon-button {
+				width: 42px;
+				height: 42px;
+				display: grid;
+				place-items: center;
+				font-size: 18px;
+				position: relative;
+			}
+
+			.avatar {
+				width: 42px;
+				height: 42px;
+				display: grid;
+				place-items: center;
+				border-radius: 14px;
+				background: linear-gradient(140deg, #dcebd8, #eadcf5);
+				color: #4c6e53;
+				font-size: 12px;
+				font-weight: 800;
+			}
+
+			.welcome {
+				position: relative;
+				overflow: hidden;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 18px;
+				padding: 26px;
+				margin-bottom: 23px;
+				border: 1px solid #e5cfe0;
+				border-radius: 25px;
+				background:
+					radial-gradient(circle at 88% 10%, #ffffffb8, transparent 22%),
+					linear-gradient(112deg, #f4d5e6, #e9def5 48%, #d9ead5);
+				box-shadow: 0 15px 35px #95649b1b;
+			}
+
+			.welcome:after {
+				content: "✿";
+				position: absolute;
+				right: 23%;
+				top: -44px;
+				color: #a55e9a22;
+				font-size: 155px;
+				transform: rotate(-18deg);
+			}
+
+			.welcome-copy {
+				position: relative;
+				z-index: 1;
+			}
+			.welcome h2 {
+				font:
+					800 22px "Manrope",
+					sans-serif;
+				margin: 0 0 8px;
+			}
+			.welcome p {
+				max-width: 530px;
+				color: #6e6574;
+				font-size: 12px;
+				line-height: 1.7;
+				margin: 0;
+			}
+
+			.status-chip {
+				position: relative;
+				z-index: 1;
+				display: inline-flex;
+				align-items: center;
+				gap: 7px;
+				padding: 10px 13px;
+				white-space: nowrap;
+				border-radius: 99px;
+				background: #ffffffd9;
+				border: 1px solid #d3e4d0;
+				color: var(--sage-dark);
+				font-size: 11px;
+				font-weight: 800;
+			}
+
+			.dot {
+				width: 7px;
+				height: 7px;
+				display: inline-block;
+				border-radius: 50%;
+				background: #68a879;
+			}
+
+			.section-heading {
+				display: flex;
+				align-items: end;
+				justify-content: space-between;
+				gap: 12px;
+				margin: 27px 0 13px;
+			}
+
+			.section-heading h2 {
+				font:
+					800 16px "Manrope",
+					sans-serif;
+				margin: 0;
+			}
+			.section-heading p {
+				color: var(--muted);
+				font-size: 11px;
+				margin: 5px 0 0;
+			}
+
+			.text-button {
+				border: 0;
+				background: transparent;
+				color: var(--pink-dark);
+				font-size: 11px;
+				font-weight: 800;
+			}
+
+			.stats {
+				display: grid;
+				grid-template-columns: repeat(4, minmax(0, 1fr));
+				gap: 14px;
+			}
+
+			.stat-card,
+			.panel,
+			.trend-card,
+			.tip-card {
+				min-width: 0;
+				border: 1px solid #e5dce8;
+				border-radius: 21px;
+				background: var(--card);
+				box-shadow: var(--shadow);
+			}
+
+			.stat-card {
+				position: relative;
+				overflow: hidden;
+				padding: 18px;
+				transition:
+					transform 0.2s,
+					box-shadow 0.2s;
+			}
+
+			.stat-card:before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				height: 4px;
+				background: linear-gradient(90deg, #c23d83, #9870b8, #719778);
+			}
+
+			.stat-card:hover {
+				transform: translateY(-4px);
+				box-shadow: 0 17px 35px #70527720;
+			}
+
+			.stat-top {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 8px;
+			}
+			.stat-label {
+				color: var(--muted);
+				font-size: 11px;
+				font-weight: 700;
+			}
+
+			.stat-icon {
+				width: 37px;
+				height: 37px;
+				display: grid;
+				place-items: center;
+				border-radius: 12px;
+				font-size: 17px;
+			}
+
+			.pink-icon {
+				background: linear-gradient(145deg, #f8d9e9, #efbdd8);
+			}
+			.sage-icon {
+				background: linear-gradient(145deg, #e0efdc, #bad7b8);
+			}
+			.purple-icon {
+				background: linear-gradient(145deg, #eee2f8, #d7c2e9);
+			}
+
+			.stat-value {
+				font:
+					800 27px "Manrope",
+					sans-serif;
+				margin: 13px 0 5px;
+				letter-spacing: -1px;
+			}
+			.stat-foot {
+				color: var(--muted);
+				font-size: 10px;
+			}
+			.good {
+				color: var(--sage-dark);
+				font-weight: 800;
+			}
+			.warn {
+				color: #bf7b29;
+				font-weight: 800;
+			}
+
+			.content-grid {
+				display: grid;
+				grid-template-columns: minmax(0, 1.2fr) minmax(285px, 0.8fr);
+				gap: 16px;
+				margin-top: 17px;
+			}
+
+			.panel {
+				padding: 21px;
+			}
+			.panel-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: flex-start;
+				gap: 12px;
+				margin-bottom: 18px;
+			}
+			.panel-title {
+				font:
+					800 15px "Manrope",
+					sans-serif;
+				margin: 0;
+			}
+			.panel-subtitle {
+				color: var(--muted);
+				font-size: 11px;
+				margin: 5px 0 0;
+			}
+
+			.tag {
+				padding: 6px 9px;
+				border-radius: 9px;
+				font-size: 9px;
+				font-weight: 800;
+				white-space: nowrap;
+			}
+			.tag-live {
+				background: var(--sage-soft);
+				color: var(--sage-dark);
+			}
+			.tag-demo {
+				background: linear-gradient(120deg, #f6dce9, #e9def4);
+				color: #8c3978;
+			}
+
+			.moisture-layout {
+				display: flex;
+				align-items: center;
+				gap: 23px;
+			}
+
+			.gauge {
+				--moisture: 58%;
+				width: 145px;
+				height: 145px;
+				flex: 0 0 145px;
+				display: grid;
+				place-items: center;
+				position: relative;
+				border-radius: 50%;
+				background: conic-gradient(#6f9b77 var(--moisture), #e8e2ef 0);
+				box-shadow: 0 9px 24px #709a7720;
+			}
+
+			.gauge:before {
+				content: "";
+				position: absolute;
+				inset: 11px;
+				border-radius: 50%;
+				background: var(--card);
+			}
+
+			.gauge-content {
+				position: relative;
+				text-align: center;
+			}
+			.gauge-number {
+				font:
+					800 30px "Manrope",
+					sans-serif;
+				letter-spacing: -1px;
+			}
+			.gauge-unit {
+				color: var(--muted);
+				font-size: 11px;
+			}
+
+			.moisture-info {
+				flex: 1;
+				min-width: 0;
+			}
+			.moisture-info h3 {
+				font:
+					800 15px "Manrope",
+					sans-serif;
+				margin: 0 0 7px;
+			}
+			.moisture-info p {
+				color: var(--muted);
+				font-size: 11px;
+				line-height: 1.7;
+				margin: 0 0 15px;
+			}
+			.range-row {
+				display: flex;
+				justify-content: space-between;
+				gap: 8px;
+				color: var(--muted);
+				font-size: 10px;
+				margin-bottom: 8px;
+			}
+			input[type="range"] {
+				width: 100%;
+				accent-color: var(--sage);
+			}
+			.demo-note {
+				color: var(--muted);
+				font-size: 10px;
+				line-height: 1.6;
+				margin-top: 10px;
+			}
+
+			.pump-card {
+				padding: 18px;
+				border: 1px solid #d9dfd9;
+				border-radius: 18px;
+				background:
+					radial-gradient(circle at 100% 0%, #ffffffb0, transparent 32%),
+					linear-gradient(135deg, #dcebd8, #e9e0f5 57%, #f7ddeb);
+			}
+
+			.pump-head {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 10px;
+			}
+			.pump-icon {
+				width: 44px;
+				height: 44px;
+				display: grid;
+				place-items: center;
+				border-radius: 14px;
+				background: #ffffffc9;
+				font-size: 22px;
+			}
+			.pump-title {
+				font-size: 13px;
+				font-weight: 800;
+			}
+			.pump-caption {
+				color: var(--muted);
+				font-size: 10px;
+				margin-top: 5px;
+			}
+
+			.toggle {
+				width: 47px;
+				height: 27px;
+				border: 0;
+				border-radius: 99px;
+				padding: 3px;
+				background: #bcbcc2;
+				transition: 0.2s;
+			}
+
+			.toggle:after {
+				content: "";
+				display: block;
+				width: 21px;
+				height: 21px;
+				border-radius: 50%;
+				background: white;
+				box-shadow: 0 1px 4px #0002;
+				transition: 0.2s;
+			}
+
+			.toggle.on {
+				background: var(--sage);
+			}
+			.toggle.on:after {
+				transform: translateX(20px);
+			}
+
+			.pump-status-line {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 10px;
+				margin-top: 17px;
+				padding-top: 14px;
+				border-top: 1px solid #d8dfd8;
+				font-size: 11px;
+			}
+
+			.pump-status {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				color: var(--sage-dark);
+				font-weight: 800;
+			}
+			.pump-status .dot {
+				background: #a1a39f;
+			}
+			.pump-status.running .dot {
+				background: #4fa76b;
+				box-shadow: 0 0 0 4px #59a66f22;
+			}
+
+			.pump-actions {
+				display: flex;
+				gap: 9px;
+				margin-top: 15px;
+			}
+			.btn {
+				border: 0;
+				border-radius: 11px;
+				padding: 11px 13px;
+				font-size: 11px;
+				font-weight: 800;
+				transition: 0.2s;
+			}
+			.btn-primary {
+				color: white;
+				background: linear-gradient(120deg, #bd397d, #9257ac);
+				box-shadow: 0 7px 17px #a7397e35;
+			}
+			.btn-primary:hover {
+				transform: translateY(-2px);
+				filter: brightness(0.95);
+			}
+			.btn-soft {
+				color: var(--sage-dark);
+				background: #ffffffd9;
+				border: 1px solid #d7e3d4;
+			}
+			.btn-soft:hover {
+				background: var(--sage-soft);
+			}
+			.pump-actions .btn {
+				flex: 1;
+			}
+
+			.lower-grid,
+			.insight-grid {
+				display: grid;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				gap: 16px;
+				margin-top: 16px;
+			}
+
+			.sensor-list {
+				display: grid;
+				gap: 15px;
+			}
+			.sensor-row {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+			}
+			.sensor-symbol {
+				width: 40px;
+				height: 40px;
+				display: grid;
+				place-items: center;
+				border-radius: 13px;
+				background: linear-gradient(145deg, #f5dfed, #e9def5);
+				font-size: 18px;
+				flex-shrink: 0;
+			}
+			.sensor-main {
+				flex: 1;
+				min-width: 0;
+			}
+			.sensor-name {
+				font-size: 12px;
+				font-weight: 800;
+			}
+			.sensor-desc {
+				color: var(--muted);
+				font-size: 10px;
+				margin-top: 4px;
+			}
+			.sensor-state {
+				display: inline-flex;
+				align-items: center;
+				gap: 5px;
+				color: var(--sage-dark);
+				font-size: 10px;
+				font-weight: 800;
+				white-space: nowrap;
+			}
+			.sensor-state .dot {
+				width: 6px;
+				height: 6px;
+			}
+
+			.activity-list {
+				display: grid;
+			}
+			.activity-item {
+				display: flex;
+				align-items: flex-start;
+				gap: 10px;
+				padding: 12px 0;
+				border-bottom: 1px solid #f0eaf1;
+			}
+			.activity-item:last-child {
+				border-bottom: 0;
+			}
+			.activity-icon {
+				width: 32px;
+				height: 32px;
+				display: grid;
+				place-items: center;
+				flex-shrink: 0;
+				border-radius: 11px;
+				background: var(--sage-soft);
+			}
+			.activity-icon.alert {
+				background: var(--pink-soft);
+				color: var(--pink-dark);
+			}
+			.activity-copy {
+				flex: 1;
+				min-width: 0;
+			}
+			.activity-copy strong {
+				display: block;
+				font-size: 11px;
+				margin: 2px 0 4px;
+			}
+			.activity-copy span {
+				display: block;
+				color: var(--muted);
+				font-size: 10px;
+				line-height: 1.5;
+			}
+			.activity-time {
+				color: var(--muted);
+				font-size: 9px;
+				white-space: nowrap;
+				padding-top: 4px;
+			}
+
+			.trend-card,
+			.tip-card {
+				padding: 21px;
+			}
+			.trend-head {
+				display: flex;
+				justify-content: space-between;
+				align-items: flex-start;
+				gap: 12px;
+				margin-bottom: 17px;
+			}
+			.trend-title {
+				font:
+					800 14px "Manrope",
+					sans-serif;
+				margin: 0;
+			}
+			.trend-caption {
+				color: var(--muted);
+				font-size: 10px;
+				margin-top: 5px;
+			}
+			.trend-badge {
+				background: linear-gradient(130deg, #f3dce9, #e8def5);
+				color: #814687;
+				border-radius: 9px;
+				padding: 7px 9px;
+				font-size: 10px;
+				font-weight: 800;
+			}
+
+			.chart {
+				height: 115px;
+				display: flex;
+				align-items: flex-end;
+				gap: clamp(8px, 2vw, 18px);
+				padding: 0 5px;
+				border-bottom: 1px solid var(--line);
+			}
+
+			.chart-day {
+				flex: 1;
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: flex-end;
+				gap: 7px;
+			}
+			.chart-bar {
+				width: min(27px, 78%);
+				min-height: 8px;
+				border-radius: 8px 8px 3px 3px;
+				background: linear-gradient(180deg, #c45b9b, #9a70b8 50%, #719778);
+			}
+			.chart-day span {
+				color: var(--muted);
+				font-size: 9px;
+				padding-bottom: 8px;
+			}
+
+			.tip-card {
+				position: relative;
+				overflow: hidden;
+				background:
+					radial-gradient(circle at 100% 0%, #ffffffb0, transparent 28%),
+					linear-gradient(140deg, #dcebd8, #e8def4 60%, #f6ddeb);
+			}
+
+			.tip-icon {
+				width: 42px;
+				height: 42px;
+				display: grid;
+				place-items: center;
+				border-radius: 14px;
+				background: #ffffffc9;
+				font-size: 21px;
+				margin-bottom: 14px;
+			}
+			.tip-card h3 {
+				font:
+					800 15px "Manrope",
+					sans-serif;
+				margin: 0 0 8px;
+			}
+			.tip-card p {
+				color: #6e6b75;
+				font-size: 11px;
+				line-height: 1.7;
+				margin: 0;
+			}
+			.tip-tag {
+				display: inline-flex;
+				margin-top: 13px;
+				background: #ffffffa8;
+				color: #42694a;
+				border-radius: 8px;
+				padding: 7px 9px;
+				font-size: 10px;
+				font-weight: 800;
+			}
+
+			.field-zones {
+				margin-top: 16px;
+			}
+			.zone-grid {
+				display: grid;
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+				gap: 13px;
+			}
+
+			.zone-card {
+				padding: 16px;
+				border-radius: 17px;
+				border: 1px solid transparent;
+				min-width: 0;
+				transition: transform 0.2s;
+			}
+			.zone-card:hover {
+				transform: translateY(-3px);
+			}
+			.zone-green {
+				background: linear-gradient(145deg, #dcebd8, #f3f8f0);
+				border-color: #d1e3ce;
+			}
+			.zone-purple {
+				background: linear-gradient(145deg, #e9def4, #faf6fc);
+				border-color: #dfd0ed;
+			}
+			.zone-pink {
+				background: linear-gradient(145deg, #f6dce9, #fff6fa);
+				border-color: #edcfe0;
+			}
+			.zone-top {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 8px;
+			}
+			.zone-emoji {
+				width: 38px;
+				height: 38px;
+				display: grid;
+				place-items: center;
+				background: #ffffffb8;
+				border-radius: 13px;
+				font-size: 19px;
+			}
+			.zone-status {
+				display: inline-flex;
+				align-items: center;
+				gap: 5px;
+				background: #ffffffb8;
+				border-radius: 99px;
+				padding: 6px 8px;
+				font-size: 9px;
+				font-weight: 800;
+				color: var(--sage-dark);
+			}
+			.zone-status i {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: #70a47a;
+			}
+			.zone-card h3 {
+				font:
+					800 12px "Manrope",
+					sans-serif;
+				margin: 13px 0 5px;
+			}
+			.zone-card p {
+				color: var(--muted);
+				font-size: 10px;
+				margin: 0 0 13px;
+			}
+			.zone-meter {
+				height: 7px;
+				border-radius: 99px;
+				background: #77748024;
+				overflow: hidden;
+			}
+			.zone-meter span {
+				display: block;
+				height: 100%;
+				border-radius: 99px;
+				background: linear-gradient(90deg, #bd397d, #9870b8, #719879);
+			}
+			.zone-card small {
+				display: block;
+				color: var(--muted);
+				font-size: 9px;
+				margin-top: 7px;
+			}
+
+			.quick-actions {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				gap: 15px;
+				margin-top: 17px;
+				padding: 16px;
+				border-radius: 16px;
+				background: linear-gradient(105deg, #f8eaf3, #eee5f6 53%, #eaf3e6);
+				border: 1px solid #e5d9e8;
+			}
+
+			.quick-actions strong {
+				font:
+					800 12px "Manrope",
+					sans-serif;
+			}
+			.quick-actions p {
+				color: var(--muted);
+				font-size: 10px;
+				line-height: 1.5;
+				margin: 5px 0 0;
+			}
+			.quick-action-buttons {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 9px;
+			}
+
+			.footer {
+				display: flex;
+				justify-content: space-between;
+				gap: 12px;
+				padding: 22px 2px 0;
+				color: var(--muted);
+				font-size: 10px;
+			}
+
+			.footer strong {
+				color: var(--pink-dark);
+			}
+
+			.toast {
+				position: fixed;
+				z-index: 50;
+				right: 22px;
+				bottom: 22px;
+				max-width: calc(100vw - 44px);
+				padding: 14px 17px;
+				border-radius: 13px;
+				background: #302a37;
+				color: white;
+				box-shadow: var(--shadow);
+				font-size: 12px;
+				opacity: 0;
+				transform: translateY(10px);
+				pointer-events: none;
+				transition: 0.25s;
+			}
+
+			.toast.show {
+				opacity: 1;
+				transform: translateY(0);
+			}
+
+			/* DARK THEME */
+			body[data-theme="dark"] {
+				--ink: #f0ebf3;
+				--muted: #bbb2c4;
+				--line: #45404e;
+				--card: #292631;
+				--shadow: 0 14px 34px #0003;
+				background:
+					radial-gradient(ellipse at 10% 0%, #542a4b66, transparent 32%),
+					radial-gradient(ellipse at 95% 12%, #304a3566, transparent 30%),
+					linear-gradient(135deg, #191820, #211d29 55%, #211b24);
+				background-attachment: fixed;
+			}
+
+			body[data-theme="dark"] .sidebar {
+				background: linear-gradient(180deg, #211e29, #202b25 65%, #2b202b);
+				border-color: #45404e;
+			}
+			body[data-theme="dark"] .brand-sub,
+			body[data-theme="dark"] .nav button {
+				color: #c0b8c6;
+			}
+			body[data-theme="dark"] .nav button.active {
+				background: linear-gradient(100deg, #49283f, #3b304b);
+				color: #f4d9eb;
+			}
+			body[data-theme="dark"] .stat-card,
+			body[data-theme="dark"] .panel,
+			body[data-theme="dark"] .trend-card {
+				background: linear-gradient(145deg, #292631, #24232d);
+				border-color: #45404e;
+			}
+			body[data-theme="dark"] .welcome {
+				background: linear-gradient(112deg, #49273f, #382b4c 48%, #263c2e);
+				border-color: #59415d;
+			}
+			body[data-theme="dark"] .welcome p,
+			body[data-theme="dark"] .tip-card p {
+				color: #d0c5d3;
+			}
+			body[data-theme="dark"] .pump-card {
+				background: linear-gradient(135deg, #293e30, #352b43 58%, #42273a);
+				border-color: #4b4552;
+			}
+			body[data-theme="dark"] .gauge:before {
+				background: #292631;
+			}
+			body[data-theme="dark"] .help-card {
+				background: linear-gradient(145deg, #293e30, #352b43 65%, #42273a);
+				border-color: #4b4552;
+			}
+			body[data-theme="dark"] .help-card p {
+				color: #d0c5d3;
+			}
+			body[data-theme="dark"] .tip-card {
+				background: linear-gradient(140deg, #293e30, #352b43 60%, #42273a);
+				border-color: #4b4552;
+			}
+			body[data-theme="dark"] .zone-green {
+				background: linear-gradient(145deg, #243a2b, #29342d);
+				border-color: #3c5842;
+			}
+			body[data-theme="dark"] .zone-purple {
+				background: linear-gradient(145deg, #33283e, #292631);
+				border-color: #51415f;
+			}
+			body[data-theme="dark"] .zone-pink {
+				background: linear-gradient(145deg, #402536, #292631);
+				border-color: #5a394b;
+			}
+			body[data-theme="dark"] .zone-card p,
+			body[data-theme="dark"] .zone-card small,
+			body[data-theme="dark"] .quick-actions p {
+				color: #c1b8c7;
+			}
+			body[data-theme="dark"] .zone-emoji,
+			body[data-theme="dark"] .zone-status,
+			body[data-theme="dark"] .tip-icon {
+				background: #302d39;
+				color: #e5dce9;
+			}
+			body[data-theme="dark"] .quick-actions {
+				background: linear-gradient(105deg, #352738, #30283d 52%, #26362c);
+				border-color: #4a3d50;
+			}
+			body[data-theme="dark"] .btn-soft {
+				background: linear-gradient(135deg, #302e39, #292f2b);
+				color: #c9e0cb;
+				border-color: #465447;
+			}
+			body[data-theme="dark"] .date-pill,
+			body[data-theme="dark"] .icon-button {
+				background: #292631;
+				color: #f0ebf3;
+				border-color: #45404e;
+			}
+			body[data-theme="dark"] .activity-item {
+				border-color: #403b48;
+			}
+			body[data-theme="dark"] .pump-status-line {
+				border-color: #4b4552;
+			}
+
+			@media (max-width: 1100px) {
+				.sidebar {
+					width: 210px;
+					flex-basis: 210px;
+				}
+				.stats {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+				.content-grid {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			@media (max-width: 800px) {
+				.app {
+					display: block;
+				}
+				.sidebar {
+					width: 100%;
+					padding: 15px;
+					gap: 14px;
+					border-right: 0;
+					border-bottom: 1px solid var(--line);
+				}
+				.sidebar-bottom {
+					display: none;
+				}
+				.nav-label {
+					display: none;
+				}
+				.nav {
+					display: flex;
+					overflow-x: auto;
+					gap: 6px;
+					padding-bottom: 3px;
+				}
+				.nav button {
+					width: auto;
+					white-space: nowrap;
+					padding: 10px 12px;
+				}
+				.nav button.active {
+					box-shadow: inset 0 -3px var(--pink);
+				}
+				.main {
+					padding: 20px 15px 28px;
+				}
+				.lower-grid,
+				.insight-grid {
+					grid-template-columns: 1fr;
+				}
+				.zone-grid {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			@media (max-width: 520px) {
+				.topbar {
+					align-items: flex-start;
+				}
+				.top-actions {
+					gap: 5px;
+				}
+				.date-pill {
+					display: none;
+				}
+				.welcome {
+					align-items: flex-start;
+					flex-direction: column;
+					padding: 22px;
+				}
+				.welcome:after {
+					right: 0;
+				}
+				.stats {
+					gap: 10px;
+				}
+				.stat-card {
+					padding: 14px;
+				}
+				.stat-value {
+					font-size: 23px;
+				}
+				.moisture-layout {
+					flex-direction: column;
+					align-items: stretch;
+				}
+				.gauge {
+					align-self: center;
+				}
+				.pump-actions {
+					flex-direction: column;
+				}
+				.quick-actions {
+					flex-direction: column;
+					align-items: flex-start;
+				}
+				.quick-action-buttons {
+					width: 100%;
+				}
+				.quick-action-buttons .btn {
+					flex: 1;
+				}
+				.footer {
+					flex-direction: column;
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="app">
+			<aside class="sidebar">
+				<div class="brand">
+					<div class="brand-mark">🌱</div>
+					<div>
+						<div class="brand-name">Agri<span>Guard</span></div>
+						<div class="brand-sub">SMART FARMING SYSTEM</div>
+					</div>
+				</div>
+
+				<div>
+					<div class="nav-label">WORKSPACE</div>
+					<nav class="nav">
+						<button class="active" data-section="dashboard">
+							<span class="nav-icon">▦</span> Dashboard
+						</button>
+						<button data-section="intrusion">
+							<span class="nav-icon">⌁</span> Intrusion alerts
+						</button>
+						<button data-section="irrigation">
+							<span class="nav-icon">♧</span> Irrigation control
+						</button>
+						<button data-section="sensors">
+							<span class="nav-icon">◉</span> Sensor health
+						</button>
+						<button data-section="activity">
+							<span class="nav-icon">◷</span> Activity history
+						</button>
+					</nav>
+				</div>
+
+				<div class="sidebar-bottom">
+					<div class="help-card">
+						<div class="plant">🌿</div>
+						<strong>Grow smarter, naturally.</strong>
+						<p>
+							Monitor your field, explore sample sensor readings, and manage
+							irrigation from one place.
+						</p>
+						<button class="small-link" id="aboutButton">
+							About AgriGuard ↗
+						</button>
+					</div>
+				</div>
+			</aside>
+
+			<main class="main">
+				<header class="topbar">
+					<div>
+						<div class="eyebrow">SMART AGRICULTURE · OVERVIEW</div>
+						<h1>Farm Dashboard</h1>
+						<div class="subtitle">
+							A clearer view of your field, moisture and crop protection.
+						</div>
+					</div>
+
+					<div class="top-actions">
+						<div class="date-pill" id="dateLabel">📅 Today</div>
+						<button
+							class="icon-button"
+							id="notificationButton"
+							title="View demo alerts"
+							aria-label="View demo alerts"
+						>
+							♧<span class="notification-dot"></span>
+						</button>
+						<button
+							class="icon-button"
+							id="themeToggle"
+							aria-label="Switch to dark mode"
+							title="Switch theme"
+						>
+							<span id="themeIcon">☾</span>
+						</button>
+						<div class="avatar" title="AgriGuard">AG</div>
+					</div>
+				</header>
+
+				<section class="welcome" id="welcomePanel">
+					<div class="welcome-copy">
+						<div class="eyebrow">YOUR FARM, AT A GLANCE</div>
+						<h2>Good day, Farmer! 🌱</h2>
+						<p>
+							Keep an eye on soil moisture, irrigation and possible field
+							activity. This dashboard currently uses simulated data for
+							demonstration.
+						</p>
+					</div>
+					<div class="status-chip">
+						<span class="dot"></span> Demo system ready
+					</div>
+				</section>
+
+				<div class="section-heading">
+					<div>
+						<h2>Farm overview</h2>
+						<p>A quick snapshot of your farm's current status.</p>
+					</div>
+					<button class="text-button" id="refreshButton" disabled>
+						↻ Refresh demo data
+					</button>
+				</div>
+
+				<section class="stats">
+					<article class="stat-card">
+						<div class="stat-top">
+							<span class="stat-label">Soil moisture</span
+							><span class="stat-icon sage-icon">💧</span>
+						</div>
+						<div class="stat-value"><span id="statMoisture">58</span>%</div>
+						<div class="stat-foot">
+							<span class="good">● Sample reading</span>
+						</div>
+					</article>
+
+					<article class="stat-card">
+						<div class="stat-top">
+							<span class="stat-label">Intrusion alerts</span
+							><span class="stat-icon pink-icon">⌁</span>
+						</div>
+						<div class="stat-value" id="statAlerts">02</div>
+						<div class="stat-foot"><span class="warn">● Demo alerts</span></div>
+					</article>
+
+					<article class="stat-card">
+						<div class="stat-top">
+							<span class="stat-label">Water pump</span
+							><span class="stat-icon sage-icon">♧</span>
+						</div>
+						<div class="stat-value" id="statPump">OFF</div>
+						<div class="stat-foot">Controlled by demo buttons</div>
+					</article>
+
+					<article class="stat-card">
+						<div class="stat-top">
+							<span class="stat-label">Sensors online</span
+							><span class="stat-icon purple-icon">◉</span>
+						</div>
+						<div class="stat-value">
+							03 <span style="font-size: 13px; color: var(--muted)">/ 03</span>
+						</div>
+						<div class="stat-foot">
+							<span class="good">● Sample sensor status</span>
+						</div>
+					</article>
+				</section>
+
+				<div class="content-grid">
+					<section class="panel" id="moisturePanel">
+						<div class="panel-header">
+							<div>
+								<h2 class="panel-title">Soil moisture monitor</h2>
+								<p class="panel-subtitle">
+									Explore how different moisture levels affect the dashboard.
+								</p>
+							</div>
+							<span class="tag tag-demo">SIMULATED</span>
+						</div>
+
+						<div class="moisture-layout">
+							<div class="gauge" id="moistureGauge">
+								<div class="gauge-content">
+									<div class="gauge-number">
+										<span id="gaugeValue">58</span>%
+									</div>
+									<div class="gauge-unit">Soil moisture</div>
+								</div>
+							</div>
+
+							<div class="moisture-info">
+								<h3 id="moistureState">Looking good!</h3>
+								<p id="moistureMessage">
+									The demo moisture level is within the target range. Your plant
+									can wait before its next watering.
+								</p>
+								<div class="range-row">
+									<span>Dry</span><span>Ideal</span><span>Wet</span>
+								</div>
+								<input
+									type="range"
+									id="moistureSlider"
+									disabled
+									min="0"
+									max="100"
+									value="58"
+									aria-label="Adjust demo soil moisture"
+								/>
+								<div class="demo-note" id="moistureCaption">
+									<span class="good">● Healthy range</span>
+								</div>
+							</div>
+						</div>
+						<p class="demo-note">
+							Demo only: moving the slider changes the sample reading, not a
+							physical sensor.
+						</p>
+					</section>
+
+					<section class="panel" id="pumpPanel">
+						<div class="panel-header">
+							<div>
+								<h2 class="panel-title">Irrigation control</h2>
+								<p class="panel-subtitle">Manage the simulated water pump.</p>
+							</div>
+							<span class="tag tag-live">DEMO CONTROL</span>
+						</div>
+
+						<div class="pump-card">
+							<div class="pump-head">
+								<div style="display: flex; align-items: center; gap: 12px">
+									<div class="pump-icon">♧</div>
+									<div>
+										<div class="pump-title">Main water pump</div>
+										<div class="pump-caption" id="pumpCaption">
+											<span class="good">●</span> Waiting for dry-soil condition
+										</div>
+									</div>
+								</div>
+								<button
+									class="toggle"
+									id="pumpToggle"
+									disabled
+									role="switch"
+									aria-checked="false"
+									aria-label="Toggle demo pump"
+								></button>
+							</div>
+
+							<div class="pump-status-line">
+								<span>Current status</span>
+								<span class="pump-status" id="pumpStatus"
+									><span class="dot"></span
+									><span id="pumpStatusText">Pump is off</span></span
+								>
+							</div>
+
+							<div class="pump-actions">
+								<button class="btn btn-primary" id="startPump" disabled>
+									▶ Start pump
+								</button>
+								<button class="btn btn-soft" id="stopPump" disabled>
+									■ Stop pump
+								</button>
+							</div>
+						</div>
+						<p class="demo-note">
+							The buttons do not switch a real pump on or off.
+						</p>
+					</section>
+				</div>
+
+				<div class="lower-grid">
+					<section class="panel" id="sensorPanel">
+						<div class="panel-header">
+							<div>
+								<h2 class="panel-title">Sensor health</h2>
+								<p class="panel-subtitle">
+									Sample status of the planned field sensors.
+								</p>
+							</div>
+							<span class="tag tag-live">3 SENSORS</span>
+						</div>
+
+						<div class="sensor-list">
+							<div class="sensor-row">
+								<div class="sensor-symbol">◉</div>
+								<div class="sensor-main">
+									<div class="sensor-name">Soil moisture sensor</div>
+									<div class="sensor-desc">Soil hydration monitoring</div>
+								</div>
+								<div class="sensor-state">
+									<span class="dot"></span> Demo ready
+								</div>
+							</div>
+							<div class="sensor-row">
+								<div class="sensor-symbol">⌁</div>
+								<div class="sensor-main">
+									<div class="sensor-name">PIR motion sensor</div>
+									<div class="sensor-desc">
+										Movement detection near the field
+									</div>
+								</div>
+								<div class="sensor-state">
+									<span class="dot"></span> Demo ready
+								</div>
+							</div>
+							<div class="sensor-row">
+								<div class="sensor-symbol">⌖</div>
+								<div class="sensor-main">
+									<div class="sensor-name">Ultrasonic sensor</div>
+									<div class="sensor-desc">
+										Distance and proximity monitoring
+									</div>
+								</div>
+								<div class="sensor-state">
+									<span class="dot"></span> Demo ready
+								</div>
+							</div>
+						</div>
+						<p class="demo-note">
+							These statuses are examples and do not confirm that the hardware
+							is connected.
+						</p>
+					</section>
+
+					<section class="panel" id="activityPanel">
+						<div class="panel-header">
+							<div>
+								<h2 class="panel-title">Recent activity</h2>
+								<p class="panel-subtitle">
+									Sample events from this dashboard session.
+								</p>
+							</div>
+							<button class="text-button" id="clearActivity">Clear all</button>
+						</div>
+
+						<div class="activity-list" id="activityList">
+							<div class="activity-item">
+								<div class="activity-icon alert">⌁</div>
+								<div class="activity-copy">
+									<strong>Intrusion alert recorded</strong
+									><span>Possible movement detected near the field.</span>
+								</div>
+								<span class="activity-time">10:42 AM</span>
+							</div>
+							<div class="activity-item">
+								<div class="activity-icon">💧</div>
+								<div class="activity-copy">
+									<strong>Soil moisture checked</strong
+									><span>Demo reading is currently within target range.</span>
+								</div>
+								<span class="activity-time">10:18 AM</span>
+							</div>
+							<div class="activity-item">
+								<div class="activity-icon">♧</div>
+								<div class="activity-copy">
+									<strong>Irrigation system idle</strong
+									><span>Pump is waiting for a dry-soil condition.</span>
+								</div>
+								<span class="activity-time">09:55 AM</span>
+							</div>
+						</div>
+					</section>
+				</div>
+
+				<div class="insight-grid">
+					<section class="trend-card">
+						<div class="trend-head">
+							<div>
+								<h2 class="trend-title">Weekly moisture trend</h2>
+								<div class="trend-caption">
+									Illustrative readings across the last seven days.
+								</div>
+							</div>
+							<span class="trend-badge">THIS WEEK</span>
+						</div>
+
+						<div class="chart" aria-label="Sample weekly moisture chart">
+							<div class="chart-day">
+								<div class="chart-bar" style="height: 44%"></div>
+								<span>Mon</span>
+							</div>
+							<div class="chart-day">
+								<div class="chart-bar" style="height: 61%"></div>
+								<span>Tue</span>
+							</div>
+							<div class="chart-day">
+								<div class="chart-bar" style="height: 52%"></div>
+								<span>Wed</span>
+							</div>
+							<div class="chart-day">
+								<div class="chart-bar" style="height: 73%"></div>
+								<span>Thu</span>
+							</div>
+							<div class="chart-day">
+								<div class="chart-bar" style="height: 66%"></div>
+								<span>Fri</span>
+							</div>
+							<div class="chart-day">
+								<div class="chart-bar" style="height: 83%"></div>
+								<span>Sat</span>
+							</div>
+							<div class="chart-day">
+								<div class="chart-bar" style="height: 58%"></div>
+								<span>Sun</span>
+							</div>
+						</div>
+						<p class="demo-note">
+							Chart values are illustrative, not readings collected from your
+							field.
+						</p>
+					</section>
+
+					<section class="tip-card">
+						<div class="tip-icon">🌱</div>
+						<h3>Today's field note</h3>
+						<p>
+							Check soil moisture before watering. Too much water can reduce air
+							around plant roots, while dry soil can stress crops. The ideal
+							moisture level depends on the crop and soil type.
+						</p>
+						<span class="tip-tag">SMART WATERING TIP</span>
+					</section>
+				</div>
+
+				<section class="panel field-zones" id="fieldZonesPanel">
+					<div class="panel-header">
+						<div>
+							<h2 class="panel-title">Field zones & quick actions</h2>
+							<p class="panel-subtitle">
+								An overview of areas you could monitor in a real deployment.
+							</p>
+						</div>
+						<span class="tag tag-demo">INTERACTIVE DEMO</span>
+					</div>
+
+					<div class="zone-grid">
+						<article class="zone-card zone-green">
+							<div class="zone-top">
+								<span class="zone-emoji">🌿</span
+								><span class="zone-status"><i></i> Stable</span>
+							</div>
+							<h3>Zone A · Crop beds</h3>
+							<p>Moisture-focused monitoring</p>
+							<div class="zone-meter"><span style="width: 68%"></span></div>
+							<small>Sample condition · 68%</small>
+						</article>
+
+						<article class="zone-card zone-purple">
+							<div class="zone-top">
+								<span class="zone-emoji">🛡️</span
+								><span class="zone-status"><i></i> Protected</span>
+							</div>
+							<h3>Zone B · Field boundary</h3>
+							<p>Movement and intrusion watch</p>
+							<div class="zone-meter"><span style="width: 84%"></span></div>
+							<small>Sample coverage · 84%</small>
+						</article>
+
+						<article class="zone-card zone-pink">
+							<div class="zone-top">
+								<span class="zone-emoji">💧</span
+								><span class="zone-status"><i></i> Monitor</span>
+							</div>
+							<h3>Zone C · Water line</h3>
+							<p>Irrigation system overview</p>
+							<div class="zone-meter"><span style="width: 52%"></span></div>
+							<small>Sample readiness · 52%</small>
+						</article>
+					</div>
+
+					<div class="quick-actions">
+						<div>
+							<strong>Try a dashboard action</strong>
+							<p>
+								These buttons add sample events only. They do not contact real
+								sensors.
+							</p>
+						</div>
+						<div class="quick-action-buttons">
+							<button class="btn btn-primary" id="simulateAlert">
+								＋ Simulate intrusion alert
+							</button>
+							<button class="btn btn-soft" id="systemCheck">
+								✓ Run system check
+							</button>
+						</div>
+					</div>
+				</section>
+
+				<footer class="footer">
+					<span
+						><strong>AgriGuard</strong> · Smarter crop protection, gentler
+						irrigation.</span
+					>
+					<span>Student project prototype · Dashboard UI preview</span>
+				</footer>
+			</main>
+		</div>
+
+		<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+		<script>
+			const $ = (id) => document.getElementById(id);
+
+			let pumpOn = false;
+			let alertCount = 2;
+			let toastTimer;
+
+			function showToast(message) {
+				const toast = $("toast");
+				toast.textContent = message;
+				toast.classList.add("show");
+				clearTimeout(toastTimer);
+				toastTimer = setTimeout(() => toast.classList.remove("show"), 2800);
+			}
+
+			function updateDate() {
+				const now = new Date();
+				$("dateLabel").textContent =
+					"📅 " +
+					now.toLocaleDateString(undefined, {
+						weekday: "short",
+						month: "short",
+						day: "numeric",
+					});
+			}
+
+			function addActivity(title, detail, symbol, isAlert = false) {
+				const list = $("activityList");
+				const item = document.createElement("div");
+				item.className = "activity-item";
+
+				const icon = document.createElement("div");
+				icon.className = "activity-icon" + (isAlert ? " alert" : "");
+				icon.textContent = symbol;
+
+				const copy = document.createElement("div");
+				copy.className = "activity-copy";
+
+				const strong = document.createElement("strong");
+				strong.textContent = title;
+
+				const description = document.createElement("span");
+				description.textContent = detail;
+
+				const time = document.createElement("span");
+				time.className = "activity-time";
+				time.textContent = new Date().toLocaleTimeString([], {
+					hour: "2-digit",
+					minute: "2-digit",
+				});
+
+				copy.append(strong, description);
+				item.append(icon, copy, time);
+				list.prepend(item);
+			}
+
+			function setPump(isOn, logEvent = true) {
+				pumpOn = isOn;
+
+				$("pumpToggle").classList.toggle("on", pumpOn);
+				$("pumpToggle").setAttribute("aria-checked", String(pumpOn));
+				$("pumpStatus").classList.toggle("running", pumpOn);
+				$("pumpStatusText").textContent = pumpOn
+					? "Pump is running (demo)"
+					: "Pump is off";
+				$("statPump").textContent = pumpOn ? "ON" : "OFF";
+
+				$("pumpCaption").innerHTML = pumpOn
+					? '<span class="warn">●</span> Manually switched on in demo'
+					: '<span class="good">●</span> Waiting for dry-soil condition';
+
+				if (logEvent) {
+					addActivity(
+						pumpOn ? "Pump switched on" : "Pump switched off",
+						pumpOn
+							? "Demo control changed to ON."
+							: "Demo control changed to OFF.",
+						"♧",
+					);
+				}
+			}
+
+			function updateMoisture(value) {
+				value = Number(value);
+
+				$("statMoisture").textContent = value;
+				$("gaugeValue").textContent = value;
+				$("moistureGauge").style.setProperty("--moisture", value + "%");
+				$("moistureSlider").value = value;
+
+				let state, message, caption;
+
+				if (value < 35) {
+					state = "Soil looks dry";
+					message =
+						"The demo reading is below the dry-soil threshold. In a real system, this could trigger an irrigation recommendation.";
+					caption = '<span class="warn">● Needs watering</span>';
+				} else if (value < 75) {
+					state = "Looking good!";
+					message =
+						"The demo moisture level is within the target range. Your plant can wait before its next watering.";
+					caption = '<span class="good">● Healthy range</span>';
+				} else {
+					state = "Soil is quite wet";
+					message =
+						"The demo reading is high. In a real system, watering should remain off while moisture is sufficient.";
+					caption = '<span class="good">● Moist soil</span>';
+				}
+
+				$("moistureState").textContent = state;
+				$("moistureMessage").textContent = message;
+				$("moistureCaption").innerHTML = caption;
+			}
+
+			$("moistureSlider").addEventListener("input", (event) => {
+				updateMoisture(event.target.value);
+			});
+
+			$("pumpToggle").addEventListener("click", () => {
+				setPump(!pumpOn);
+			});
+
+			$("startPump").addEventListener("click", () => {
+				setPump(true);
+				showToast("Demo pump switched ON. No physical pump is connected.");
+			});
+
+			$("stopPump").addEventListener("click", () => {
+				setPump(false);
+				showToast("Demo pump switched OFF.");
+			});
+
+			$("refreshButton").addEventListener("click", () => {
+				const value = Math.floor(20 + Math.random() * 65);
+				updateMoisture(value);
+				showToast("Dashboard refreshed. The values are simulated.");
+			});
+
+			$("notificationButton").addEventListener("click", () => {
+				showToast(alertCount + " sample intrusion alerts in this demo.");
+			});
+
+			$("aboutButton").addEventListener("click", () => {
+				showToast(
+					"AgriGuard combines field intrusion alerts with soil-moisture-based irrigation.",
+				);
+			});
+
+			$("clearActivity").addEventListener("click", () => {
+				$("activityList").innerHTML =
+					'<div class="demo-note">Activity list cleared for this demo session.</div>';
+				showToast("Demo activity list cleared.");
+			});
+
+			$("simulateAlert").addEventListener("click", () => {
+				alertCount++;
+				$("statAlerts").textContent = String(alertCount).padStart(2, "0");
+
+				addActivity(
+					"Sample intrusion alert",
+					"Simulated movement detected near the field boundary.",
+					"⌁",
+					true,
+				);
+
+				showToast("Sample alert added. No real sensor was triggered.");
+			});
+
+			$("systemCheck").addEventListener("click", () => {
+				addActivity(
+					"Demo system check completed",
+					"Dashboard controls are responding. Hardware connectivity was not tested.",
+					"✓",
+				);
+
+				showToast("Demo check complete. Dashboard controls are responding.");
+			});
+
+			/* Sidebar navigation */
+			document.querySelectorAll(".nav button").forEach((button) => {
+				button.addEventListener("click", () => {
+					document.querySelectorAll(".nav button").forEach((item) => {
+						item.classList.remove("active");
+					});
+
+					button.classList.add("active");
+
+					const targets = {
+						dashboard: $("welcomePanel"),
+						intrusion: $("activityPanel"),
+						irrigation: $("pumpPanel"),
+						sensors: $("sensorPanel"),
+						activity: $("activityPanel"),
+					};
+
+					const target = targets[button.dataset.section];
+
+					if (target) {
+						target.scrollIntoView({ behavior: "smooth", block: "center" });
+					}
+
+					showToast(button.textContent.trim() + " section selected.");
+				});
+			});
+
+			/* Light and dark theme */
+			const themeToggle = $("themeToggle");
+
+			function applyTheme(theme) {
+				document.body.dataset.theme = theme;
+
+				const dark = theme === "dark";
+				$("themeIcon").textContent = dark ? "☀" : "☾";
+
+				themeToggle.setAttribute(
+					"aria-label",
+					dark ? "Switch to light mode" : "Switch to dark mode",
+				);
+
+				themeToggle.title = dark
+					? "Switch to light mode"
+					: "Switch to dark mode";
+			}
+
+			let savedTheme = "light";
+
+			try {
+				savedTheme = localStorage.getItem("agriguard-theme") || "light";
+			} catch (error) {
+				savedTheme = "light";
+			}
+
+			applyTheme(savedTheme);
+
+			themeToggle.addEventListener("click", () => {
+				const nextTheme =
+					document.body.dataset.theme === "dark" ? "light" : "dark";
+
+				applyTheme(nextTheme);
+
+				try {
+					localStorage.setItem("agriguard-theme", nextTheme);
+				} catch (error) {
+					/* The theme still works if local storage is unavailable. */
+				}
+
+				showToast(
+					nextTheme === "dark" ? "Dark mode enabled." : "Light mode enabled.",
+				);
+			});
+
+			/* Initial dashboard state */
+			updateDate();
+		</script>
+
+		<script type="module" src="script.js"></script>
+	</body>
 </html>
